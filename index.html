@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workforce Wizard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #282c34;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px;
+            padding: 20px;
+            background: #333;
+            border: 3px solid #444; /* Enhanced border for better alignment */
+            border-radius: 10px; /* Enhanced rounded corners */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555; /* Added subtle border for inputs */
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #444;
+            border: 2px solid #555; /* Added border for results section */
+            border-radius: 8px;
+        }
+        .results p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhp3VrJcYLqPjT3fqtguwljuRFKfUzEtxam1T8dacAkDQIybluvRygnnW1WgY6hEr8Xdck-zrKpmoUbkqYwcv3TH7bdddYBIQMOY3CpsSm9ulcgQ_FLQyAkyhtfcujjIl1Q5Txm98pxyNNCFLHvQKM_9Iiha5a3Dc6wLO0wGrUYgfXb46JJfeOdXYqjBfI/s1600/excellix.jpg" alt="Workforce Wizard Logo" style="max-width: 100px; border-radius: 8px;">
+        </div>
+        <h1>Workforce Wizard</h1>
+        <h2>Your Integrated Staffing Calculator</h2>
+
+        <div id="inputs">
+            <div class="input-group">
+                <label for="volume">Volume:</label>
+                <input type="number" id="volume" placeholder="Enter volume">
+            </div>
+            <div class="input-group">
+                <label for="timeEffort">Time Effort (mins):</label>
+                <input type="number" id="timeEffort" placeholder="Enter time effort">
+            </div>
+            <div class="input-group">
+                <label for="workDays">Number of Workdays:</label>
+                <input type="number" id="workDays" placeholder="Enter workdays">
+            </div>
+            <div class="input-group">
+                <label for="dailyHours">Daily Working Hours:</label>
+                <input type="number" id="dailyHours" placeholder="Enter daily hours">
+            </div>
+            <div class="input-group">
+                <label for="operatingHours">Operating Hours:</label>
+                <input type="number" id="operatingHours" placeholder="Enter operating hours">
+            </div>
+            <div class="input-group" style="position: relative;">
+                <label for="shrinkage">Shrinkage (%):</label>
+                <input type="text" id="shrinkage" placeholder="Enter shrinkage" style="padding-right: 30px;" oninput="updateShrinkage(this)">
+                <span style="position: absolute; right: 10px; top: 35px; color: #fff;">%</span>
+            </div>
+            </div>
+            <div class="input-group">
+                <label for="currentHC">Current HC:</label>
+                <input type="number" id="currentHC" placeholder="Enter current HC">
+            </div>
+            <div class="input-group">
+                <label for="costPerHour">Cost per Hour:</label>
+                <input type="number" id="costPerHour" placeholder="Enter cost per hour">
+            </div>
+            <div class="input-group">
+                <label for="revenuePerHour">Revenue per Hour:</label>
+                <input type="number" id="revenuePerHour" placeholder="Enter revenue per hour">
+            </div>
+            <button class="button" onclick="calculateResults()">Calculate</button>
+
+        <div id="results" class="results" style="display: none; margin-top: 20px;">
+            <h2>Result</h2>
+            <p id="hcRequirement"></p>
+            <p id="staffingPosition"></p>
+            <p id="queueDetails"></p>
+            <p id="costBenefit"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculateResults() {
+            // Inputs
+            const volume = parseFloat(document.getElementById('volume').value);
+            const timeEffort = parseFloat(document.getElementById('timeEffort').value) / 60; // Convert mins to hrs
+            const workDays = parseInt(document.getElementById('workDays').value);
+            const dailyHours = parseFloat(document.getElementById('dailyHours').value);
+            const operatingHours = parseFloat(document.getElementById('operatingHours').value);
+            const shrinkage = parseFloat(document.getElementById('shrinkage').value) / 100; // Convert % to decimal
+            const currentHC = parseFloat(document.getElementById('currentHC').value);
+            const costPerHour = parseFloat(document.getElementById('costPerHour').value);
+            const revenuePerHour = parseFloat(document.getElementById('revenuePerHour').value);
+
+            if (isNaN(volume) || isNaN(timeEffort) || isNaN(workDays) || isNaN(dailyHours) || isNaN(operatingHours) ||
+                isNaN(shrinkage) || isNaN(currentHC) || isNaN(costPerHour) || isNaN(revenuePerHour)) {
+                alert("Please fill out all the fields with valid numbers.");
+                return;
+            }
+
+            // Calculations
+            const effectiveShrinkage = 1 - shrinkage;
+            const hcRequirement = (volume * timeEffort) / (workDays * dailyHours * effectiveShrinkage) * (operatingHours / dailyHours);
+            const staffingPosition = currentHC - hcRequirement;
+            const cost = Math.abs(staffingPosition * costPerHour * workDays * dailyHours);
+            const revenue = staffingPosition < 0 ? Math.abs(staffingPosition * revenuePerHour * workDays * dailyHours) : 0;
+            const directMargin = revenue - cost;
+            const directMarginPercent = revenue !== 0 ? (directMargin / revenue) * 100 : 0;
+
+            // Display Results
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('hcRequirement').innerText = `HC Requirement: ${hcRequirement.toFixed(2)}`;
+            document.getElementById('staffingPosition').innerText = `Staffing Position: ${staffingPosition.toFixed(2)}`;
+            document.getElementById('queueDetails').innerHTML = `<h3>Profitability</h3><p>Revenue: ${revenue.toFixed(2)}</p><p>Cost: ${cost.toFixed(2)}</p><p>Direct Margin: ${directMargin.toFixed(2)} (${directMarginPercent.toFixed(2)}%)`;
+            document.getElementById('costBenefit').innerText = '';
+        }
+        function updateShrinkage(input) {
+        let value = input.value.replace('%', '').trim(); // Remove % if already present
+        if (!isNaN(value) && value !== '') {
+            input.value = value + '%'; // Add % dynamically
+        } else {
+            input.value = ''; // Reset if input is invalid
+        }
+    }
+</script>
+</body>
+</html>
