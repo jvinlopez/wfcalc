@@ -17,9 +17,10 @@
             color: #ffffff;
         }
         .container {
-            max-width: 800px;
-            margin: 20px;
-            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 15px;
             background: #333;
             border: 3px solid #444;
             border-radius: 10px;
@@ -27,6 +28,7 @@
             box-sizing: border-box;
         }
         h1, h2 {
+            font-size: 1.5em;
             text-align: center;
         }
         .input-group {
@@ -38,7 +40,7 @@
         }
         .input-group input {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #555;
             border-radius: 4px;
             box-sizing: border-box;
@@ -58,14 +60,22 @@
             background: #0056b3;
         }
         .results {
-            margin-top: 20px;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
             padding: 10px;
             background: #444;
             border: 2px solid #555;
             border-radius: 8px;
+            box-sizing: border-box;
         }
         .results p {
             margin: 5px 0;
+        }
+        .results h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #ffffff;
         }
         .logo {
             display: flex;
@@ -127,12 +137,21 @@
             </div>
             <button class="button" onclick="calculateResults()">Calculate</button>
 
-            <div id="results" class="results" style="display: none; margin-top: 20px;">
+            <div id="results" class="results" style="display: none;">
                 <h2>Result</h2>
                 <p id="hcRequirement"></p>
                 <p id="staffingPosition"></p>
-                <p id="queueDetails"></p>
-                <p id="costBenefit"></p>
+                <p id="maximumRevenue" style="margin-bottom: 20px;"></p>
+                <h3>Current Capacity</h3>
+                <p id="currentCapacity"></p>
+                <p id="currentDM" style="margin-bottom: 20px;"></p>
+                <h3>Optimal Capacity</h3>
+                <p id="optimalCapacity">Required HC: <span id='optimalHC'></span><br>Capacity: <span id='optimalCapacityResult'></span><br>Cost: <span id='optimalCost'></span><br>Revenue: <span id='optimalRevenue'></span><br>Direct Margin: <span id='optimalDM'></span> (<span id='optimalDMPercent'></span>%)</p>
+                <h3>Recommended Additions</h3>
+                <p id="recommendedHC"></p>
+                <p id="recommendedDetails" style="margin-bottom: 20px;"></p>
+                <h3>Analysis Summary</h3>
+                <p id="analysisSummary" style="margin-bottom: 20px;"></p>
                 <!-- New Survey Button -->
                 <button class="button" id="surveyButton" style="margin-top: 20px; display: none;" onclick="openSurvey()">Take a Survey Now</button>
             </div>
@@ -143,7 +162,7 @@
         function calculateResults() {
             // Inputs
             const volume = parseFloat(document.getElementById('volume').value);
-            const timeEffort = parseFloat(document.getElementById('timeEffort').value) / 60; // Convert mins to hrs
+            const timeEffort = parseFloat(document.getElementById('timeEffort').value); // Time Effort in minutes
             const workDays = parseInt(document.getElementById('workDays').value);
             const dailyHours = parseFloat(document.getElementById('dailyHours').value);
             const operatingHours = parseFloat(document.getElementById('operatingHours').value);
@@ -159,23 +178,76 @@
             }
 
             // Calculations
-            const effectiveShrinkage = 1 - shrinkage;
-            const hcRequirement = (volume * timeEffort) / (workDays * dailyHours * effectiveShrinkage) * (operatingHours / dailyHours);
-            const staffingPosition = currentHC - hcRequirement;
-            const cost = Math.abs(staffingPosition * costPerHour * workDays * dailyHours);
-            const revenue = staffingPosition < 0 ? Math.abs(staffingPosition * revenuePerHour * workDays * dailyHours) : 0;
-            const directMargin = revenue - cost;
-            const directMarginPercent = revenue !== 0 ? (directMargin / revenue) * 100 : 0;
+            const transactionsPerHour = 60 / timeEffort; // Transactions per hour
+            const revenuePerTransaction = revenuePerHour / transactionsPerHour;
 
-            // Display Results
+            // Maximum Revenue
+            const maximumRevenue = revenuePerTransaction * volume;
+
+            // HC Requirement (Schedule Coverage)
+            const hcRequirement = (volume / (transactionsPerHour * dailyHours * workDays)) / (1 - shrinkage) * (operatingHours / dailyHours);
+
+            // Current Capacity Calculations
+            const currentCapacity = (currentHC / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
+            const currentRevenue = Math.min(currentCapacity * revenuePerTransaction, maximumRevenue);
+            const currentCost = costPerHour * currentHC * dailyHours * workDays;
+            const currentDM = currentRevenue - currentCost;
+            const currentDMPercent = (currentDM / currentRevenue) * 100;
+
+            // Optimal Capacity Calculations
+            const optimalCapacity = (hcRequirement / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
+            const optimalRevenue = Math.min(optimalCapacity * revenuePerTransaction, maximumRevenue);
+            const optimalCost = costPerHour * hcRequirement * dailyHours * workDays;
+            const optimalDM = optimalRevenue - optimalCost;
+            const optimalDMPercent = (optimalDM / optimalRevenue) * 100;
+
+            // Recommended HC
+            const recommendedHC = Math.ceil(hcRequirement - currentHC);
+            if (recommendedHC > 0) {
+                document.getElementById('recommendedHC').innerText = `Additional HC Needed: ${recommendedHC}`;
+                document.getElementById('recommendedDetails').innerText = `To meet the optimal capacity, hire ${recommendedHC} more staff to cover the shortfall.`;
+            } else {
+                document.getElementById('recommendedHC').innerText = `No Additional HC Needed`;
+                document.getElementById('recommendedDetails').innerText = `Your current staffing levels are sufficient to meet the required capacity.`;
+            }
+
+            // Formatting for thousands
+            const formatNumber = (num) => num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Populate Results
             document.getElementById('results').style.display = 'block';
-            document.getElementById('hcRequirement').innerText = `HC Requirement: ${hcRequirement.toFixed(2)}`;
-            document.getElementById('staffingPosition').innerText = `Staffing Position: ${staffingPosition.toFixed(2)}`;
-            document.getElementById('queueDetails').innerHTML = `<h3>Profitability</h3><p>Revenue: ${revenue.toFixed(2)}</p><p>Cost: ${cost.toFixed(2)}</p><p>Direct Margin: ${directMargin.toFixed(2)} (${directMarginPercent.toFixed(2)}%)`;
-            document.getElementById('costBenefit').innerText = '';
-
-            // Show survey button
             document.getElementById('surveyButton').style.display = 'block';
+            document.getElementById('hcRequirement').innerText = `HC Requirement: ${formatNumber(hcRequirement)}`;
+            document.getElementById('staffingPosition').innerText = `Staffing Position: ${currentHC - hcRequirement > 0 ? "Overstaffed" : "Understaffed"}`;
+            document.getElementById('maximumRevenue').innerText = `Maximum Revenue: $${formatNumber(maximumRevenue)}`;
+            document.getElementById('currentCapacity').innerText = `HC: ${currentHC}
+Capacity: ${formatNumber(currentCapacity)}
+Cost: ${formatNumber(currentCost)}
+Revenue: ${formatNumber(currentRevenue)}
+Direct Margin: ${formatNumber(currentDM)} (${currentDMPercent.toFixed(2)}%)`;
+            if (currentHC < hcRequirement) {
+                const opportunityLoss = maximumRevenue - currentRevenue;
+                document.getElementById('currentCapacity').innerText += `
+Opportunity Loss: $${formatNumber(opportunityLoss)}`;
+            }
+            document.getElementById('optimalHC').innerText = `${formatNumber(hcRequirement)}`;
+            document.getElementById('optimalCapacityResult').innerText = `${formatNumber(optimalCapacity)}`;
+            document.getElementById('optimalCost').innerText = `${formatNumber(optimalCost)}`;
+            document.getElementById('optimalRevenue').innerText = `${formatNumber(optimalRevenue)}`;
+            document.getElementById('optimalDM').innerText = `${formatNumber(optimalDM)}`;
+            document.getElementById('optimalDMPercent').innerText = `${optimalDMPercent.toFixed(2)}`;
+
+            // Analysis Summary
+            let analysisSummary = "";
+            if (currentHC < hcRequirement) {
+                analysisSummary = `Your current headcount of ${currentHC} can handle ${formatNumber(currentCapacity)} transactions. To achieve optimal capacity with consideration of operational hours, you need to hire ${recommendedHC} staff with an associated cost of $${formatNumber(optimalCost)} and a direct margin of $${formatNumber(optimalDM)} (${optimalDMPercent.toFixed(2)}%).`;
+            } else if (Math.abs(currentHC - hcRequirement) <= 0.9) {
+                analysisSummary = `Staffing position is rightly staffed. No adjustments are needed.`;
+            } else {
+                const surplus = (currentHC - hcRequirement).toFixed(2);
+                analysisSummary = `Staffing position is overstaffed with ${surplus} HC. Consider redistributing resources or adjusting staff levels to optimize costs.`;
+            }
+            document.getElementById('analysisSummary').innerText = analysisSummary;
         }
 
         function openSurvey() {
@@ -183,11 +255,11 @@
         }
 
         function updateShrinkage(input) {
-            let value = input.value.replace('%', '').trim(); // Remove % if already present
+            const value = input.value.replace('%', '').trim();
             if (!isNaN(value) && value !== '') {
-                input.value = value + '%'; // Add % dynamically
+                input.value = `${value}%`;
             } else {
-                input.value = ''; // Reset if input is invalid
+                input.value = '';
             }
         }
     </script>
