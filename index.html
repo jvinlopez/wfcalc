@@ -203,7 +203,7 @@
 
             // Recommended HC
             const recommendedHC = Math.ceil(hcRequirement - currentHC);
-            if (recommendedHC > 0) {
+            if (recommendedHC > 0 && Math.abs(currentHC - hcRequirement) > 0.9) {
                 document.getElementById('recommendedHC').innerText = `Additional HC Needed: ${recommendedHC}`;
                 document.getElementById('recommendedDetails').innerText = `To meet the optimal capacity, hire ${recommendedHC} more staff to cover the shortfall.`;
             } else {
@@ -218,7 +218,7 @@
             document.getElementById('results').style.display = 'block';
             document.getElementById('surveyButton').style.display = 'block';
             document.getElementById('hcRequirement').innerText = `HC Requirement: ${formatNumber(hcRequirement)}`;
-            document.getElementById('staffingPosition').innerText = `Staffing Position: ${currentHC - hcRequirement > 0 ? "Overstaffed" : "Understaffed"}`;
+            document.getElementById('staffingPosition').innerText = `Staffing Position: ${Math.abs(currentHC - hcRequirement) <= 0.9 ? "Rightly staffed" : (currentHC - hcRequirement > 0 ? "Overstaffed" : "Understaffed")}`;
             document.getElementById('maximumRevenue').innerText = `Maximum Revenue: $${formatNumber(maximumRevenue)}`;
             document.getElementById('currentCapacity').innerText = `HC: ${currentHC}
 Capacity: ${formatNumber(currentCapacity)}
@@ -239,10 +239,10 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
 
             // Analysis Summary
             let analysisSummary = "";
-            if (currentHC < hcRequirement) {
-                analysisSummary = `Your current headcount of ${currentHC} can handle ${formatNumber(currentCapacity)} transactions. To achieve optimal capacity with consideration of operational hours, you need to hire ${recommendedHC} staff with an associated cost of $${formatNumber(optimalCost)} and a direct margin of $${formatNumber(optimalDM)} (${optimalDMPercent.toFixed(2)}%).`;
-            } else if (Math.abs(currentHC - hcRequirement) <= 0.9) {
+            if (Math.abs(currentHC - hcRequirement) <= 0.9) {
                 analysisSummary = `Staffing position is rightly staffed. No adjustments are needed.`;
+            } else if (currentHC < hcRequirement) {
+                analysisSummary = `Your current headcount of ${currentHC} can handle ${formatNumber(currentCapacity)} transactions. To achieve optimal capacity with consideration of operational hours, you need to hire ${recommendedHC} staff with an associated cost of $${formatNumber(optimalCost)} and a direct margin of $${formatNumber(optimalDM)} (${optimalDMPercent.toFixed(2)}%).`;
             } else {
                 const surplus = (currentHC - hcRequirement).toFixed(2);
                 analysisSummary = `Staffing position is overstaffed with ${surplus} HC. Consider redistributing resources or adjusting staff levels to optimize costs.`;
