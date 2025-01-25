@@ -291,7 +291,7 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
             { element: '#operatingHours', text: 'Daily operating hours.' },
             { element: '#shrinkage', text: 'Allowances for Breaks, Coaching, team meetings, training.' },
             { element: '#currentHC', text: 'Current Productive Employee.' },
-            { element: '#costPerHour', text: 'The cost per hour for each employee.' },
+            { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
             { element: '#revenuePerHour', text: 'Revenue generated per the amount of completed work per staff.' }
         ];
         let currentStep = 0;
@@ -316,7 +316,7 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
             tooltip.className = 'tooltip';
             tooltip.innerHTML = `
                 <div>${step.text}</div>
-                <div style="margin-top: 10px; text-align: center;">
+                <div style="margin-top: 5px; text-align: block;">
                     <button onclick="nextStep()" style="margin-right: 5px;">Next</button>
                     <button onclick="endTour()">End Tour</button>
                 </div>
@@ -328,7 +328,7 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
             const tooltipWidth = tooltip.offsetWidth;
             const tooltipHeight = tooltip.offsetHeight;
 
-            const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 200;
+            const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 75;
             const verticalPosition = rect.top + window.scrollY - tooltipHeight + 50;
 
             tooltip.style.left = `${horizontalCenter}px`;
