@@ -83,6 +83,7 @@
             text-align: center;
             margin-bottom: 20px;
             position: relative;
+            height: 120px; /* Ensure enough space for icons */
         }
         .logo img {
             max-width: 100px;
@@ -104,6 +105,36 @@
         .logo a:nth-child(2) {
             right: 5px;
         }
+        .logo a.menu {
+            left: 5px;
+            top: 50px; 
+            position: absolute;
+            display: inline-block; /* Make the icon visible */
+
+        }
+        .menu {
+            display: none;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            list-style-type: none;
+            text-align: left;
+            position: absolute;
+            left: 620px; 
+            top: 100px; /* Adjusted for visibility */
+            z-index: 1000;
+        }
+        .menu li {
+            margin-bottom: 5px;
+        }
+        .menu a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+        .menu a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -112,11 +143,22 @@
         <div class="logo">
             <a href="https://jvinlopez.github.io/excellix/" title="Home">🏠</a>
             <a href="#" onclick="startTour()" title="Quick Tour">🧭</a>
+            <a href="#" onclick="toggleMenu()" title="Menu" class="menu">☰</a>
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhp3VrJcYLqPjT3fqtguwljuRFKfUzEtxam1T8dacAkDQIybluvRygnnW1WgY6hEr8Xdck-zrKpmoUbkqYwcv3TH7bdddYBIQMOY3CpsSm9ulcgQ_FLQyAkyhtfcujjIl1Q5Txm98pxyNNCFLHvQKM_9Iiha5a3Dc6wLO0wGrUYgfXb46JJfeOdXYqjBfI/s1600/excellix.jpg" alt="Workforce Wizard Logo">
         </div>
 
         <h1>Workforce Wizard</h1>
         <h2>Your Integrated Staffing Calculator</h2>
+
+        <div id="menu" class="menu">
+            <ul>
+                <li><a href="https://jvinlopez.github.io/Demand-Forecasting/">Demand Forecasting</a></li>
+                <li><a href="#">Design of Experiment Inferential</a></li>
+                <li><a href="#">Queueing Theory</a></li>
+                <li><a href="#">Linear Programming</a></li>
+                <li><a href="#">Project Management</a></li>
+            </ul>
+        </div>
 
         <div id="inputs">
             <div class="input-group">
@@ -275,6 +317,15 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
             window.open('https://forms.office.com/r/NCndgkVuDq', '_blank');
         }
 
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+
         function updateShrinkage(input) {
             const value = input.value.replace('%', '').trim();
             if (!isNaN(value) && value !== '') {
@@ -283,6 +334,7 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
                 input.value = '';
             }
         }
+
         const steps = [
             { element: '#volume', text: 'Enter the total volume of transactions here.' },
             { element: '#timeEffort', text: 'Specify the average time effort per transaction in minutes.' },
@@ -305,7 +357,7 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
             const step = steps[currentStep];
             const element = document.querySelector(step.element);
 
-            if (!element) {
+             if (!element) {
                 console.error(`Element not found for step:`, step);
                 endTour();
                 return;
@@ -353,3 +405,5 @@ Opportunity Loss: $${formatNumber(opportunityLoss)}`;
     </script>
 </body>
 </html>
+
+
