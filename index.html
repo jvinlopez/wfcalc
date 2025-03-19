@@ -1,409 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workforce Wizard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #282c34;
-            color: #ffffff;
-        }
-        .container {
-            max-width: 400px;
-            width: 100%;
-            margin: 20px auto;
-            padding: 15px;
-            background: #333;
-            border: 3px solid #444;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            box-sizing: border-box;
-        }
-        h1, h2 {
-            font-size: 1.5em;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background: #0056b3;
-        }
-        .tooltip {
-            position: absolute;
-            background: #444;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            width: 300px;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
-            height: 120px; /* Ensure enough space for icons */
-        }
-        .logo img {
-            max-width: 100px;
-            border-radius: 8px;
-        }
-        .logo a {
-            position: absolute;
-            top: 0;
-            text-decoration: none;
-            color: white;
-            font-size: 24px;
-            background: #444;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .logo a:nth-child(1) {
-            left: 5px;
-        }
-        .logo a:nth-child(2) {
-            right: 5px;
-        }
-        .logo a.menu {
-            left: 5px;
-            top: 50px; 
-            position: absolute;
-            display: inline-block; /* Make the icon visible */
-
-        }
-        .menu {
-            display: none;
-            background: #444;
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-            list-style-type: none;
-            text-align: left;
-            position: absolute;
-            left: 5px; 
-            top: 100px; /* Adjusted for visibility */
-            z-index: 1000;
-        }
-        .menu li {
-            margin-bottom: 5px;
-        }
-        .menu a {
-            color: #00bfff;
-            text-decoration: none;
-        }
-        .menu a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workforce Wizard</title>
+  <!-- Include SheetJS for Excel export functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #3E4A45; /* Ash-like darker green apple color */
+      color: #ffffff;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 15px;
+      background: #43614F; /* Inner background: muted green shade */
+      border: 3px solid #3E4A45;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
+    }
+    /* Top icons: Home, Quick Tour, Menu */
+    .top-icons {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .top-icons a {
+      text-decoration: none;
+      color: white;
+      font-size: 24px;
+    }
+    /* Enlarged logo image */
+    .logo {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .logo img {
+      max-width: 800px; /* Slightly larger logo */
+      border-radius: 8px;
+    }
+    /* Slogan styling: smaller font size */
+    .slogan {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .slogan h2 {
+      font-size: .75em;
+      margin: 0;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background: #23BFCF;
+    }
+    /* Button for reset with a distinct color */
+    .button.reset {
+      background: #15737D;
+    }
+    .button.reset:hover {
+      background: #c82333;
+    }
+    /* Flex container for Calculate and Reset buttons */
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    .button-group button {
+      flex: 1;
+    }
+    .tooltip {
+      position: absolute;
+      background: #444;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      width: 300px;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    .menu {
+      display: none;
+      background: #444;
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+      list-style-type: none;
+      text-align: left;
+      position: absolute;
+      left: 5px; 
+      top: 100px;
+      z-index: 1000;
+    }
+    .menu li {
+      margin-bottom: 5px;
+    }
+    .menu a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+    .menu a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <div id="overlay" class="overlay"></div>
-    <div class="container">
-        <div class="logo">
-            <a href="https://jvinlopez.github.io/excellix/" title="Home">🏠</a>
-            <a href="#" onclick="startTour()" title="Quick Tour">🧭</a>
-            <a href="#" onclick="toggleMenu()" title="Menu" class="menu">☰</a>
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhp3VrJcYLqPjT3fqtguwljuRFKfUzEtxam1T8dacAkDQIybluvRygnnW1WgY6hEr8Xdck-zrKpmoUbkqYwcv3TH7bdddYBIQMOY3CpsSm9ulcgQ_FLQyAkyhtfcujjIl1Q5Txm98pxyNNCFLHvQKM_9Iiha5a3Dc6wLO0wGrUYgfXb46JJfeOdXYqjBfI/s1600/excellix.jpg" alt="Workforce Wizard Logo">
-        </div>
-
-        <h1>Workforce Wizard</h1>
-        <h2>Your Integrated Staffing Calculator</h2>
-
-        <div id="menu" class="menu">
-            <ul>
-                <li><a href="https://jvinlopez.github.io/Demand-Forecasting/">Demand Forecasting</a></li>
-		<li><a href="https://jvinlopez.github.io/Queueing/">Queueing Theory</a></li>
-                <li><a href="https://jvinlopez.github.io/Correlation/">Design of Experiment Pearson</a></li>
-		<li><a href="https://jvinlopez.github.io/ANOVA/">Design of Experiment ANOVA</a></li>
-
-            </ul>
-        </div>
-
-        <div id="inputs">
-            <div class="input-group">
-                <label for="volume">Volume:</label>
-                <input type="number" id="volume" placeholder="Enter volume">
-            </div>
-            <div class="input-group">
-                <label for="timeEffort">Time Effort (mins):</label>
-                <input type="number" id="timeEffort" placeholder="Enter time effort">
-            </div>
-            <div class="input-group">
-                <label for="workDays">Number of Workdays:</label>
-                <input type="number" id="workDays" placeholder="Enter workdays">
-            </div>
-            <div class="input-group">
-                <label for="dailyHours">Daily Working Hours:</label>
-                <input type="number" id="dailyHours" placeholder="Enter daily hours">
-            </div>
-            <div class="input-group">
-                <label for="operatingHours">Operating Hours:</label>
-                <input type="number" id="operatingHours" placeholder="Enter operating hours">
-            </div>
-            <div class="input-group" style="position: relative;">
-                <label for="shrinkage">Shrinkage (%):</label>
-                <input type="text" id="shrinkage" placeholder="Enter shrinkage" style="padding-right: 30px;" oninput="updateShrinkage(this)">
-                <span style="position: absolute; right: 10px; top: 35px; color: #fff;">%</span>
-            </div>
-            <div class="input-group">
-                <label for="currentHC">Current HC:</label>
-                <input type="number" id="currentHC" placeholder="Enter current HC">
-            </div>
-            <div class="input-group">
-                <label for="costPerHour">Cost per Hour:</label>
-                <input type="number" id="costPerHour" placeholder="Enter cost per hour">
-            </div>
-            <div class="input-group">
-                <label for="revenuePerHour">Revenue per Hour:</label>
-                <input type="number" id="revenuePerHour" placeholder="Enter revenue per hour">
-            </div>
-            <button class="button" onclick="calculateResults()">Calculate</button>
-
-            <div id="results" class="results" style="display: none; line-height: 1.5;">
-                <h2>Result</h2>
-                <p id="hcRequirement"></p>
-                <p id="staffingPosition"></p>
-                <p id="maximumRevenue" style="margin-bottom: 20px;"></p>
-                <h3>Current Capacity</h3>
-                <p id="currentCapacity"></p>
-                <p id="currentDM" style="margin-bottom: 20px;"></p>
-                <h3>Optimal Capacity</h3>
-                <p id="optimalCapacity">Required HC: <span id='optimalHC'></span><br>Capacity: <span id='optimalCapacityResult'></span><br>Cost: <span id='optimalCost'></span><br>Revenue: <span id='optimalRevenue'></span><br>Direct Margin: <span id='optimalDM'></span> (<span id='optimalDMPercent'></span>%)</p>
-                <h3>Recommended Additions</h3>
-                <p id="recommendedHC"></p>
-                <p id="recommendedDetails" style="margin-bottom: 20px;"></p>
-                <h3>Analysis Summary</h3>
-                <p id="analysisSummary" style="margin-bottom: 20px;"></p>
-                <!-- New Survey Button -->
-                <button class="button" id="surveyButton" style="margin-top: 20px; display: none;" onclick="openSurvey()">Take a Survey Now</button>
-            </div>
-        </div>
+  <div id="overlay" class="overlay"></div>
+  <div class="container">
+    <!-- Top icon navigation -->
+    <div class="top-icons">
+      <a href="https://jvinlopez.github.io/excellix/" title="Home">🏠</a>
+      <a href="#" onclick="startTour()" title="Quick Tour">🧭</a>
+      <a href="#" onclick="toggleMenu()" title="Menu">☰</a>
     </div>
-
-    <script>
-        function calculateResults() {
-            // Inputs
-            const volume = parseFloat(document.getElementById('volume').value);
-            const timeEffort = parseFloat(document.getElementById('timeEffort').value); // Time Effort in minutes
-            const workDays = parseInt(document.getElementById('workDays').value);
-            const dailyHours = parseFloat(document.getElementById('dailyHours').value);
-            const operatingHours = parseFloat(document.getElementById('operatingHours').value);
-            const shrinkage = parseFloat(document.getElementById('shrinkage').value) / 100; // Convert % to decimal
-            const currentHC = parseFloat(document.getElementById('currentHC').value);
-            const costPerHour = parseFloat(document.getElementById('costPerHour').value);
-            const revenuePerHour = parseFloat(document.getElementById('revenuePerHour').value);
-
-            if (isNaN(volume) || isNaN(timeEffort) || isNaN(workDays) || isNaN(dailyHours) || isNaN(operatingHours) ||
-                isNaN(shrinkage) || isNaN(currentHC) || isNaN(costPerHour) || isNaN(revenuePerHour)) {
-                alert("Please fill out all the fields with valid numbers.");
-                return;
-            }
-
-            // Calculations
-            const transactionsPerHour = 60 / timeEffort; // Transactions per hour
-            const revenuePerTransaction = revenuePerHour / transactionsPerHour;
-
-            // Maximum Revenue
-            const maximumRevenue = revenuePerTransaction * volume;
-
-            // HC Requirement (Schedule Coverage)
-            const hcRequirement = (volume / (transactionsPerHour * dailyHours * workDays)) / (1 - shrinkage) * (operatingHours / dailyHours);
-
-            // Current Capacity Calculations
-            const currentCapacity = (currentHC / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
-            const currentRevenue = Math.min(currentCapacity * revenuePerTransaction, maximumRevenue);
-            const currentCost = costPerHour * currentHC * dailyHours * workDays;
-            const currentDM = currentRevenue - currentCost;
-            const currentDMPercent = (currentDM / currentRevenue) * 100;
-
-            // Optimal Capacity Calculations
-            const optimalCapacity = (hcRequirement / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
-            const optimalRevenue = Math.min(optimalCapacity * revenuePerTransaction, maximumRevenue);
-            const optimalCost = costPerHour * hcRequirement * dailyHours * workDays;
-            const optimalDM = optimalRevenue - optimalCost;
-            const optimalDMPercent = (optimalDM / optimalRevenue) * 100;
-
-            // Recommended HC
-            const recommendedHC = Math.ceil(hcRequirement - currentHC);
-            if (recommendedHC > 0 && Math.abs(currentHC - hcRequirement) > 0.9) {
-                document.getElementById('recommendedHC').innerText = `Additional HC Needed: ${recommendedHC}`;
-                document.getElementById('recommendedDetails').innerText = `To meet the optimal capacity, hire ${recommendedHC} more staff to cover the shortfall.`;
-            } else {
-                document.getElementById('recommendedHC').innerText = `No Additional HC Needed`;
-                document.getElementById('recommendedDetails').innerText = `Your current staffing levels are sufficient to meet the required capacity.`;
-            }
-
-            // Formatting for thousands
-            const formatNumber = (num) => num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-            // Populate Results
-            document.getElementById('results').style.display = 'block';
-            document.getElementById('surveyButton').style.display = 'block';
-            document.getElementById('hcRequirement').innerText = `HC Requirement: ${formatNumber(hcRequirement)}`;
-            document.getElementById('staffingPosition').innerText = `Staffing Position: ${Math.abs(currentHC - hcRequirement) <= 0.9 ? "Rightly staffed" : (currentHC - hcRequirement > 0 ? "Overstaffed" : "Understaffed")}`;
-            document.getElementById('maximumRevenue').innerText = `Maximum Revenue: $${formatNumber(maximumRevenue)}`;
-            document.getElementById('currentCapacity').innerText = `HC: ${currentHC}
-Capacity: ${formatNumber(currentCapacity)}
-Cost: ${formatNumber(currentCost)}
-Revenue: ${formatNumber(currentRevenue)}
-Direct Margin: ${formatNumber(currentDM)} (${currentDMPercent.toFixed(2)}%)`;
-            if (currentHC < hcRequirement) {
-                const opportunityLoss = maximumRevenue - currentRevenue;
-                document.getElementById('currentCapacity').innerText += `
-Opportunity Loss: $${formatNumber(opportunityLoss)}`;
-            }
-            document.getElementById('optimalHC').innerText = `${formatNumber(hcRequirement)}`;
-            document.getElementById('optimalCapacityResult').innerText = `${formatNumber(optimalCapacity)}`;
-            document.getElementById('optimalCost').innerText = `${formatNumber(optimalCost)}`;
-            document.getElementById('optimalRevenue').innerText = `${formatNumber(optimalRevenue)}`;
-            document.getElementById('optimalDM').innerText = `${formatNumber(optimalDM)}`;
-            document.getElementById('optimalDMPercent').innerText = `${optimalDMPercent.toFixed(2)}`;
-
-            // Analysis Summary
-            let analysisSummary = "";
-            if (Math.abs(currentHC - hcRequirement) <= 0.9) {
-                analysisSummary = `Staffing position is rightly staffed. No adjustments are needed.`;
-            } else if (currentHC < hcRequirement) {
-                analysisSummary = `Your current headcount of ${currentHC} can handle ${formatNumber(currentCapacity)} transactions. To achieve optimal capacity with consideration of operational hours, you need to hire ${recommendedHC} staff with an associated cost of $${formatNumber(optimalCost)} and a direct margin of $${formatNumber(optimalDM)} (${optimalDMPercent.toFixed(2)}%).`;
-            } else {
-                const surplus = (currentHC - hcRequirement).toFixed(2);
-                analysisSummary = `Staffing position is overstaffed with ${surplus} HC. Consider redistributing resources or adjusting staff levels to optimize costs.`;
-            }
-            document.getElementById('analysisSummary').innerText = analysisSummary;
-        }
-
-        function openSurvey() {
-            window.open('https://forms.office.com/r/NCndgkVuDq', '_blank');
-        }
-
-        function toggleMenu() {
-            const menu = document.getElementById('menu');
-            if (menu.style.display === 'block') {
-                menu.style.display = 'none';
-            } else {
-                menu.style.display = 'block';
-            }
-        }
-
-        function updateShrinkage(input) {
-            const value = input.value.replace('%', '').trim();
-            if (!isNaN(value) && value !== '') {
-                input.value = `${value}%`;
-            } else {
-                input.value = '';
-            }
-        }
-
-        const steps = [
-            { element: '#volume', text: 'Enter the total volume of transactions here.' },
-            { element: '#timeEffort', text: 'Specify the average time effort per transaction in minutes.' },
-            { element: '#workDays', text: 'Provide the number of workdays in the calculation period.' },
-            { element: '#dailyHours', text: 'Employee daily working hours.' },
-            { element: '#operatingHours', text: 'Daily operating hours.' },
-            { element: '#shrinkage', text: 'Allowances for Breaks, Coaching, team meetings, training.' },
-            { element: '#currentHC', text: 'Current Productive Employee.' },
-            { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
-            { element: '#revenuePerHour', text: 'Revenue generated per the amount of completed work per staff.' }
-        ];
-        let currentStep = 0;
-
-        function startTour() {
-            document.getElementById('overlay').style.display = 'block';
-            showTooltip();
-        }
-
-        function showTooltip() {
-            const step = steps[currentStep];
-            const element = document.querySelector(step.element);
-
-             if (!element) {
-                console.error(`Element not found for step:`, step);
-                endTour();
-                return;
-            }
-
-            const rect = element.getBoundingClientRect();
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.innerHTML = `
-                <div>${step.text}</div>
-                <div style="margin-top: 5px; text-align: block;">
-                    <button onclick="nextStep()" style="margin-right: 5px;">Next</button>
-                    <button onclick="endTour()">End Tour</button>
-                </div>
-            `;
-            
-            document.body.appendChild(tooltip);
-
-            // Correctly position the tooltip after appending
-            const tooltipWidth = tooltip.offsetWidth;
-            const tooltipHeight = tooltip.offsetHeight;
-
-            const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 75;
-            const verticalPosition = rect.top + window.scrollY - tooltipHeight + 50;
-
-            tooltip.style.left = `${horizontalCenter}px`;
-            tooltip.style.top = `${verticalPosition}px`;
-        }
-
-        function nextStep() {
-            document.querySelector('.tooltip').remove();
-            currentStep++;
-            if (currentStep < steps.length) {
-                showTooltip();
-            } else {
-                endTour();
-            }
-        }
-
-        function endTour() {
-            document.querySelector('.tooltip')?.remove();
-            document.getElementById('overlay').style.display = 'none';
-            currentStep = 0;
-        }
-    </script>
+    <!-- Logo image only -->
+    <div class="logo">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi07AbSzwmXhHr3pP8BVrkijVXYKffzIzup2hwn4nTioAU_Tfa_RG_XDAhyOcSMP2TH-bBQpyrn5INpOubCgfQgjG5dlS3VpwuYx_MmJDI5fTSNMkPa-uAuSId5axBuhZ0Alvq0ogLzpd2ifsg26o3HLD-xEsijg1TLOfi6DRvDan6Qx6yWOGisTLnGlqk/s320/Tool%20Logo%203.png" alt="Workforce Wizard Logo">
+    </div>
+    <!-- Slogan with smaller font size -->
+    <div class="slogan">
+      <h2>Integrated Staffing Calculator</h2>
+    </div>
+    
+    <!-- Hidden menu that toggles on click -->
+    <div id="menu" class="menu">
+      <ul>
+        <li><a href="https://jvinlopez.github.io/Demand-Forecasting/">Demand Forecasting</a></li>
+        <li><a href="https://jvinlopez.github.io/Queueing/">Queueing Theory</a></li>
+        <li><a href="https://jvinlopez.github.io/Correlation/">Design of Experiment Pearson</a></li>
+        <li><a href="https://jvinlopez.github.io/ANOVA/">Design of Experiment ANOVA</a></li>
+      </ul>
+    </div>
+    
+    <!-- Input Form -->
+    <div id="inputs">
+      <div class="input-group">
+        <label for="volume">Volume:</label>
+        <input type="number" id="volume" placeholder="Enter volume">
+      </div>
+      <div class="input-group">
+        <label for="timeEffort">Time Effort (mins):</label>
+        <input type="number" id="timeEffort" placeholder="Enter time effort">
+      </div>
+      <div class="input-group">
+        <label for="workDays">Number of Workdays:</label>
+        <input type="number" id="workDays" placeholder="Enter workdays">
+      </div>
+      <div class="input-group">
+        <label for="dailyHours">Daily Working Hours:</label>
+        <input type="number" id="dailyHours" placeholder="Enter daily hours">
+      </div>
+      <div class="input-group">
+        <label for="operatingHours">Operating Hours:</label>
+        <input type="number" id="operatingHours" placeholder="Enter operating hours">
+      </div>
+      <div class="input-group" style="position: relative;">
+        <label for="shrinkage">Shrinkage (%):</label>
+        <input type="text" id="shrinkage" placeholder="Enter shrinkage" style="padding-right: 30px;" oninput="updateShrinkage(this)">
+        <span style="position: absolute; right: 10px; top: 35px; color: #fff;">%</span>
+      </div>
+      <div class="input-group">
+        <label for="currentHC">Current HC:</label>
+        <input type="number" id="currentHC" placeholder="Enter current HC">
+      </div>
+      <div class="input-group">
+        <label for="costPerHour">Cost per Hour:</label>
+        <input type="number" id="costPerHour" placeholder="Enter cost per hour">
+      </div>
+      <div class="input-group">
+        <label for="revenuePerHour">Revenue per Hour:</label>
+        <input type="number" id="revenuePerHour" placeholder="Enter revenue per hour">
+      </div>
+      <!-- Button Group for Calculate and Reset -->
+      <div class="button-group">
+        <button class="button" onclick="calculateResults()">Calculate</button>
+        <button class="button reset" onclick="resetAll()">Reset</button>
+      </div>
+      
+      <!-- Results Section with Excel Export Button -->
+      <div id="results" class="results" style="display: none; line-height: 1.5;">
+        <h2>Result</h2>
+        <p id="hcRequirement"></p>
+        <p id="staffingPosition"></p>
+        <p id="maximumRevenue" style="margin-bottom: 20px;"></p>
+        <h3>Current Capacity</h3>
+        <p id="currentCapacity"></p>
+        <p id="currentDM" style="margin-bottom: 20px;"></p>
+        <h3>Optimal Capacity</h3>
+        <p id="optimalCapacity">
+          Required HC: <span id="optimalHC"></span><br>
+          Capacity: <span id="optimalCapacityResult"></span><br>
+          Cost: <span id="optimalCost"></span><br>
+          Revenue: <span id="optimalRevenue"></span><br>
+          Direct Margin: <span id="optimalDM"></span> (<span id="optimalDMPercent"></span>%)
+        </p>
+        <h3>Recommended Additions</h3>
+        <p id="recommendedHC"></p>
+        <p id="recommendedDetails" style="margin-bottom: 20px;"></p>
+        <h3>Analysis Summary</h3>
+        <p id="analysisSummary" style="margin-bottom: 20px;"></p>
+        <button class="button" id="excelButton" style="margin-top: 20px;" onclick="extractResultsExcel()">Extract Results in Excel</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function calculateResults() {
+      // Retrieve input values
+      const volume = parseFloat(document.getElementById('volume').value);
+      const timeEffort = parseFloat(document.getElementById('timeEffort').value);
+      const workDays = parseInt(document.getElementById('workDays').value);
+      const dailyHours = parseFloat(document.getElementById('dailyHours').value);
+      const operatingHours = parseFloat(document.getElementById('operatingHours').value);
+      const shrinkage = parseFloat(document.getElementById('shrinkage').value) / 100;
+      const currentHC = parseFloat(document.getElementById('currentHC').value);
+      const costPerHour = parseFloat(document.getElementById('costPerHour').value);
+      const revenuePerHour = parseFloat(document.getElementById('revenuePerHour').value);
+      
+      if (isNaN(volume) || isNaN(timeEffort) || isNaN(workDays) || isNaN(dailyHours) || isNaN(operatingHours) ||
+          isNaN(shrinkage) || isNaN(currentHC) || isNaN(costPerHour) || isNaN(revenuePerHour)) {
+        alert("Please fill out all the fields with valid numbers.");
+        return;
+      }
+      
+      // Calculations
+      const transactionsPerHour = 60 / timeEffort;
+      const revenuePerTransaction = revenuePerHour / transactionsPerHour;
+      const maximumRevenue = revenuePerTransaction * volume;
+      const hcRequirement = (volume / (transactionsPerHour * dailyHours * workDays)) / (1 - shrinkage) * (operatingHours / dailyHours);
+      const currentCapacity = (currentHC / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
+      const currentRevenue = Math.min(currentCapacity * revenuePerTransaction, maximumRevenue);
+      const currentCost = costPerHour * currentHC * dailyHours * workDays;
+      const currentDM = currentRevenue - currentCost;
+      const currentDMPercent = (currentDM / currentRevenue) * 100;
+      const optimalCapacity = (hcRequirement / (operatingHours / dailyHours)) * (1 - shrinkage) * transactionsPerHour * dailyHours * workDays;
+      const optimalRevenue = Math.min(optimalCapacity * revenuePerTransaction, maximumRevenue);
+      const optimalCost = costPerHour * hcRequirement * dailyHours * workDays;
+      const optimalDM = optimalRevenue - optimalCost;
+      const optimalDMPercent = (optimalDM / optimalRevenue) * 100;
+      const recommendedHC = Math.ceil(hcRequirement - currentHC);
+      
+      if (recommendedHC > 0 && Math.abs(currentHC - hcRequirement) > 0.9) {
+        document.getElementById('recommendedHC').innerText = `Additional HC Needed: ${recommendedHC}`;
+        document.getElementById('recommendedDetails').innerText = `To meet the optimal capacity, hire ${recommendedHC} more staff to cover the shortfall.`;
+      } else {
+        document.getElementById('recommendedHC').innerText = `No Additional HC Needed`;
+        document.getElementById('recommendedDetails').innerText = `Your current staffing levels are sufficient to meet the required capacity.`;
+      }
+      
+      const formatNumber = (num) => num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('hcRequirement').innerText = `HC Requirement: ${formatNumber(hcRequirement)}`;
+      document.getElementById('staffingPosition').innerText = `Staffing Position: ${Math.abs(currentHC - hcRequirement) <= 0.9 ? "Rightly staffed" : (currentHC - hcRequirement > 0 ? "Overstaffed" : "Understaffed")}`;
+      document.getElementById('maximumRevenue').innerText = `Maximum Revenue: $${formatNumber(maximumRevenue)}`;
+      
+      let currentCapacityText = `HC: ${currentHC}\nCapacity: ${formatNumber(currentCapacity)}\nCost: ${formatNumber(currentCost)}\nRevenue: ${formatNumber(currentRevenue)}\nDirect Margin: ${formatNumber(currentDM)} (${currentDMPercent.toFixed(2)}%)`;
+      if (currentHC < hcRequirement) {
+        const opportunityLoss = maximumRevenue - currentRevenue;
+        currentCapacityText += `\nOpportunity Loss: $${formatNumber(opportunityLoss)}`;
+      }
+      document.getElementById('currentCapacity').innerText = currentCapacityText;
+      document.getElementById('optimalHC').innerText = `${formatNumber(hcRequirement)}`;
+      document.getElementById('optimalCapacityResult').innerText = `${formatNumber(optimalCapacity)}`;
+      document.getElementById('optimalCost').innerText = `${formatNumber(optimalCost)}`;
+      document.getElementById('optimalRevenue').innerText = `${formatNumber(optimalRevenue)}`;
+      document.getElementById('optimalDM').innerText = `${formatNumber(optimalDM)}`;
+      document.getElementById('optimalDMPercent').innerText = `${optimalDMPercent.toFixed(2)}`;
+      
+      let analysisSummary = "";
+      if (Math.abs(currentHC - hcRequirement) <= 0.9) {
+        analysisSummary = `Staffing position is rightly staffed. No adjustments are needed.`;
+      } else if (currentHC < hcRequirement) {
+        analysisSummary = `Your current headcount of ${currentHC} can handle ${formatNumber(currentCapacity)} transactions. To achieve optimal capacity with consideration of operational hours, you need to hire ${recommendedHC} staff with an associated cost of $${formatNumber(optimalCost)} and a direct margin of $${formatNumber(optimalDM)} (${optimalDMPercent.toFixed(2)}%).`;
+      } else {
+        const surplus = (currentHC - hcRequirement).toFixed(2);
+        analysisSummary = `Staffing position is overstaffed with ${surplus} HC. Consider redistributing resources or adjusting staff levels to optimize costs.`;
+      }
+      document.getElementById('analysisSummary').innerText = analysisSummary;
+    }
+    
+    function extractResultsExcel() {
+      // Gather input values for the "Inputs" sheet
+      const inputs = [
+        ["Parameter", "Value"],
+        ["Volume", document.getElementById('volume').value],
+        ["Time Effort (mins)", document.getElementById('timeEffort').value],
+        ["Number of Workdays", document.getElementById('workDays').value],
+        ["Daily Working Hours", document.getElementById('dailyHours').value],
+        ["Operating Hours", document.getElementById('operatingHours').value],
+        ["Shrinkage (%)", document.getElementById('shrinkage').value],
+        ["Current HC", document.getElementById('currentHC').value],
+        ["Cost per Hour", document.getElementById('costPerHour').value],
+        ["Revenue per Hour", document.getElementById('revenuePerHour').value]
+      ];
+      
+      // Gather results for the "Results" sheet (strip any labels)
+      const results = [
+        ["Result", "Value"],
+        ["HC Requirement", document.getElementById('hcRequirement').innerText.replace("HC Requirement: ", "")],
+        ["Staffing Position", document.getElementById('staffingPosition').innerText.replace("Staffing Position: ", "")],
+        ["Maximum Revenue", document.getElementById('maximumRevenue').innerText.replace("Maximum Revenue: $", "")],
+        ["Current Capacity", document.getElementById('currentCapacity').innerText],
+        ["Optimal HC", document.getElementById('optimalHC').innerText],
+        ["Optimal Capacity", document.getElementById('optimalCapacityResult').innerText],
+        ["Optimal Cost", document.getElementById('optimalCost').innerText],
+        ["Optimal Revenue", document.getElementById('optimalRevenue').innerText],
+        ["Optimal Direct Margin", document.getElementById('optimalDM').innerText],
+        ["Optimal DM Percent", document.getElementById('optimalDMPercent').innerText],
+        ["Recommended HC", document.getElementById('recommendedHC').innerText],
+        ["Recommended Details", document.getElementById('recommendedDetails').innerText],
+        ["Analysis Summary", document.getElementById('analysisSummary').innerText]
+      ];
+      
+      // Create a new workbook and add sheets
+      const wb = XLSX.utils.book_new();
+      const wsInputs = XLSX.utils.aoa_to_sheet(inputs);
+      const wsResults = XLSX.utils.aoa_to_sheet(results);
+      XLSX.utils.book_append_sheet(wb, wsInputs, "Inputs");
+      XLSX.utils.book_append_sheet(wb, wsResults, "Results");
+      
+      // Export the workbook as an Excel file
+      XLSX.writeFile(wb, "WorkforceWizardResults.xlsx");
+    }
+    
+    function resetAll() {
+      // Clear all input fields
+      document.getElementById('volume').value = "";
+      document.getElementById('timeEffort').value = "";
+      document.getElementById('workDays').value = "";
+      document.getElementById('dailyHours').value = "";
+      document.getElementById('operatingHours').value = "";
+      document.getElementById('shrinkage').value = "";
+      document.getElementById('currentHC').value = "";
+      document.getElementById('costPerHour').value = "";
+      document.getElementById('revenuePerHour').value = "";
+      
+      // Hide results and clear result fields
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('hcRequirement').innerText = "";
+      document.getElementById('staffingPosition').innerText = "";
+      document.getElementById('maximumRevenue').innerText = "";
+      document.getElementById('currentCapacity').innerText = "";
+      document.getElementById('currentDM').innerText = "";
+      document.getElementById('optimalHC').innerText = "";
+      document.getElementById('optimalCapacityResult').innerText = "";
+      document.getElementById('optimalCost').innerText = "";
+      document.getElementById('optimalRevenue').innerText = "";
+      document.getElementById('optimalDM').innerText = "";
+      document.getElementById('optimalDMPercent').innerText = "";
+      document.getElementById('recommendedHC').innerText = "";
+      document.getElementById('recommendedDetails').innerText = "";
+      document.getElementById('analysisSummary').innerText = "";
+    }
+    
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+    
+    function updateShrinkage(input) {
+      const value = input.value.replace('%', '').trim();
+      if (!isNaN(value) && value !== '') {
+        input.value = `${value}%`;
+      } else {
+        input.value = '';
+      }
+    }
+    
+    // Tour steps for user guidance (optional enhancement)
+    const steps = [
+      { element: '#volume', text: 'The total volume of transactions.' },
+      { element: '#timeEffort', text: 'The time effort per transaction in minutes.' },
+      { element: '#workDays', text: 'The number of days covered by the volume.' },
+      { element: '#dailyHours', text: 'The amount of time an Employee works in a Day ex. A 40hr work week is 8 hrs per day.' },
+      { element: '#operatingHours', text: 'Hours of Operation.' },
+      { element: '#shrinkage', text: 'Allowances for Breaks, Coaching, team meetings, training.' },
+      { element: '#currentHC', text: 'Current Productive Employee count.' },
+      { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
+      { element: '#revenuePerHour', text: 'Revenue generated per the amount of completed work per staff.' }
+    ];
+    let currentStep = 0;
+    
+    function startTour() {
+      document.getElementById('overlay').style.display = 'block';
+      showTooltip();
+    }
+    
+    function showTooltip() {
+      const step = steps[currentStep];
+      const element = document.querySelector(step.element);
+      if (!element) {
+        console.error(`Element not found for step:`, step);
+        endTour();
+        return;
+      }
+      const rect = element.getBoundingClientRect();
+      const tooltip = document.createElement('div');
+      tooltip.className = 'tooltip';
+      tooltip.innerHTML = `
+        <div>${step.text}</div>
+        <div style="margin-top: 5px;">
+          <button onclick="nextStep()" style="margin-right: 5px;">Next</button>
+          <button onclick="endTour()">End Tour</button>
+        </div>
+      `;
+      document.body.appendChild(tooltip);
+      
+      const tooltipWidth = tooltip.offsetWidth;
+      const tooltipHeight = tooltip.offsetHeight;
+      const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 75;
+      const verticalPosition = rect.top + window.scrollY - tooltipHeight + 50;
+      tooltip.style.left = `${horizontalCenter}px`;
+      tooltip.style.top = `${verticalPosition}px`;
+    }
+    
+    function nextStep() {
+      document.querySelector('.tooltip').remove();
+      currentStep++;
+      if (currentStep < steps.length) {
+        showTooltip();
+      } else {
+        endTour();
+      }
+    }
+    
+    function endTour() {
+      document.querySelector('.tooltip')?.remove();
+      document.getElementById('overlay').style.display = 'none';
+      currentStep = 0;
+    }
+  </script>
 </body>
 </html>
-
-
