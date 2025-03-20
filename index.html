@@ -83,14 +83,12 @@
     .button:hover {
       background: #23BFCF;
     }
-    /* Button for reset with a distinct color */
     .button.reset {
       background: #15737D;
     }
     .button.reset:hover {
       background: #c82333;
     }
-    /* Flex container for Calculate and Reset buttons */
     .button-group {
       display: flex;
       gap: 10px;
@@ -156,12 +154,12 @@
     <div class="logo">
       <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi07AbSzwmXhHr3pP8BVrkijVXYKffzIzup2hwn4nTioAU_Tfa_RG_XDAhyOcSMP2TH-bBQpyrn5INpOubCgfQgjG5dlS3VpwuYx_MmJDI5fTSNMkPa-uAuSId5axBuhZ0Alvq0ogLzpd2ifsg26o3HLD-xEsijg1TLOfi6DRvDan6Qx6yWOGisTLnGlqk/s320/Tool%20Logo%203.png" alt="Workforce Wizard Logo">
     </div>
-    <!-- Slogan with smaller font size -->
+    <!-- Slogan -->
     <div class="slogan">
       <h2>Integrated Staffing Calculator</h2>
     </div>
     
-    <!-- Hidden menu that toggles on click -->
+    <!-- Hidden menu -->
     <div id="menu" class="menu">
       <ul>
         <li><a href="https://jvinlopez.github.io/Demand-Forecasting/">Demand Forecasting</a></li>
@@ -177,9 +175,10 @@
         <label for="volume">Volume:</label>
         <input type="number" id="volume" placeholder="Enter volume">
       </div>
+      <!-- Updated label and placeholder: now in seconds -->
       <div class="input-group">
-        <label for="timeEffort">Time Effort (mins):</label>
-        <input type="number" id="timeEffort" placeholder="Enter time effort">
+        <label for="timeEffort">Time Effort (seconds):</label>
+        <input type="number" id="timeEffort" placeholder="Enter time effort in seconds">
       </div>
       <div class="input-group">
         <label for="workDays">Number of Workdays:</label>
@@ -215,8 +214,9 @@
         <button class="button" onclick="calculateResults()">Calculate</button>
         <button class="button reset" onclick="resetAll()">Reset</button>
       </div>
+      <button class="button" id="excelButton" style="margin-top: 20px;" onclick="extractResultsExcel()">Extract Results in Excel</button>
       
-      <!-- Results Section with Excel Export Button -->
+      <!-- Results Section -->
       <div id="results" class="results" style="display: none; line-height: 1.5;">
         <h2>Result</h2>
         <p id="hcRequirement"></p>
@@ -238,7 +238,6 @@
         <p id="recommendedDetails" style="margin-bottom: 20px;"></p>
         <h3>Analysis Summary</h3>
         <p id="analysisSummary" style="margin-bottom: 20px;"></p>
-        <button class="button" id="excelButton" style="margin-top: 20px;" onclick="extractResultsExcel()">Extract Results in Excel</button>
       </div>
     </div>
   </div>
@@ -247,7 +246,7 @@
     function calculateResults() {
       // Retrieve input values
       const volume = parseFloat(document.getElementById('volume').value);
-      const timeEffort = parseFloat(document.getElementById('timeEffort').value);
+      const timeEffort = parseFloat(document.getElementById('timeEffort').value); // Now in seconds
       const workDays = parseInt(document.getElementById('workDays').value);
       const dailyHours = parseFloat(document.getElementById('dailyHours').value);
       const operatingHours = parseFloat(document.getElementById('operatingHours').value);
@@ -262,8 +261,8 @@
         return;
       }
       
-      // Calculations
-      const transactionsPerHour = 60 / timeEffort;
+      // Updated Calculation: since timeEffort is in seconds, use 3600 seconds per hour.
+      const transactionsPerHour = 3600 / timeEffort;
       const revenuePerTransaction = revenuePerHour / transactionsPerHour;
       const maximumRevenue = revenuePerTransaction * volume;
       const hcRequirement = (volume / (transactionsPerHour * dailyHours * workDays)) / (1 - shrinkage) * (operatingHours / dailyHours);
@@ -320,11 +319,10 @@
     }
     
     function extractResultsExcel() {
-      // Gather input values for the "Inputs" sheet
       const inputs = [
         ["Parameter", "Value"],
         ["Volume", document.getElementById('volume').value],
-        ["Time Effort (mins)", document.getElementById('timeEffort').value],
+        ["Time Effort (seconds)", document.getElementById('timeEffort').value],
         ["Number of Workdays", document.getElementById('workDays').value],
         ["Daily Working Hours", document.getElementById('dailyHours').value],
         ["Operating Hours", document.getElementById('operatingHours').value],
@@ -334,8 +332,7 @@
         ["Revenue per Hour", document.getElementById('revenuePerHour').value]
       ];
       
-      // Gather results for the "Results" sheet (strip any labels)
-      const results = [
+      const resultsData = [
         ["Result", "Value"],
         ["HC Requirement", document.getElementById('hcRequirement').innerText.replace("HC Requirement: ", "")],
         ["Staffing Position", document.getElementById('staffingPosition').innerText.replace("Staffing Position: ", "")],
@@ -352,19 +349,15 @@
         ["Analysis Summary", document.getElementById('analysisSummary').innerText]
       ];
       
-      // Create a new workbook and add sheets
       const wb = XLSX.utils.book_new();
       const wsInputs = XLSX.utils.aoa_to_sheet(inputs);
-      const wsResults = XLSX.utils.aoa_to_sheet(results);
+      const wsResults = XLSX.utils.aoa_to_sheet(resultsData);
       XLSX.utils.book_append_sheet(wb, wsInputs, "Inputs");
       XLSX.utils.book_append_sheet(wb, wsResults, "Results");
-      
-      // Export the workbook as an Excel file
       XLSX.writeFile(wb, "WorkforceWizardResults.xlsx");
     }
     
     function resetAll() {
-      // Clear all input fields
       document.getElementById('volume').value = "";
       document.getElementById('timeEffort').value = "";
       document.getElementById('workDays').value = "";
@@ -374,8 +367,6 @@
       document.getElementById('currentHC').value = "";
       document.getElementById('costPerHour').value = "";
       document.getElementById('revenuePerHour').value = "";
-      
-      // Hide results and clear result fields
       document.getElementById('results').style.display = 'none';
       document.getElementById('hcRequirement').innerText = "";
       document.getElementById('staffingPosition').innerText = "";
@@ -405,69 +396,6 @@
       } else {
         input.value = '';
       }
-    }
-    
-    // Tour steps for user guidance (optional enhancement)
-    const steps = [
-      { element: '#volume', text: 'The total volume of transactions.' },
-      { element: '#timeEffort', text: 'The time effort per transaction in minutes.' },
-      { element: '#workDays', text: 'The number of days covered by the volume.' },
-      { element: '#dailyHours', text: 'The amount of time an Employee works in a Day ex. A 40hr work week is 8 hrs per day.' },
-      { element: '#operatingHours', text: 'Hours of Operation.' },
-      { element: '#shrinkage', text: 'Allowances for Breaks, Coaching, team meetings, training.' },
-      { element: '#currentHC', text: 'Current Productive Employee count.' },
-      { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
-      { element: '#revenuePerHour', text: 'Revenue generated per the amount of completed work per staff.' }
-    ];
-    let currentStep = 0;
-    
-    function startTour() {
-      document.getElementById('overlay').style.display = 'block';
-      showTooltip();
-    }
-    
-    function showTooltip() {
-      const step = steps[currentStep];
-      const element = document.querySelector(step.element);
-      if (!element) {
-        console.error(`Element not found for step:`, step);
-        endTour();
-        return;
-      }
-      const rect = element.getBoundingClientRect();
-      const tooltip = document.createElement('div');
-      tooltip.className = 'tooltip';
-      tooltip.innerHTML = `
-        <div>${step.text}</div>
-        <div style="margin-top: 5px;">
-          <button onclick="nextStep()" style="margin-right: 5px;">Next</button>
-          <button onclick="endTour()">End Tour</button>
-        </div>
-      `;
-      document.body.appendChild(tooltip);
-      
-      const tooltipWidth = tooltip.offsetWidth;
-      const tooltipHeight = tooltip.offsetHeight;
-      const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 75;
-      const verticalPosition = rect.top + window.scrollY - tooltipHeight + 50;
-      tooltip.style.left = `${horizontalCenter}px`;
-      tooltip.style.top = `${verticalPosition}px`;
-    }
-    
-    function nextStep() {
-      document.querySelector('.tooltip').remove();
-      currentStep++;
-      if (currentStep < steps.length) {
-        showTooltip();
-      } else {
-        endTour();
-      }
-    }
-    
-    function endTour() {
-      document.querySelector('.tooltip')?.remove();
-      document.getElementById('overlay').style.display = 'none';
-      currentStep = 0;
     }
   </script>
 </body>
