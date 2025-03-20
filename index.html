@@ -43,7 +43,7 @@
       margin-bottom: 10px;
     }
     .logo img {
-      max-width: 800px; /* Slightly larger logo */
+      max-width: 800px;
       border-radius: 8px;
     }
     /* Slogan styling: smaller font size */
@@ -52,7 +52,7 @@
       margin-bottom: 20px;
     }
     .slogan h2 {
-      font-size: .75em;
+      font-size: 1em;
       margin: 0;
     }
     .input-group {
@@ -162,7 +162,6 @@
     <!-- Hidden menu -->
     <div id="menu" class="menu">
       <ul>
-	<li><a href="https://jvinlopez.github.io/wfcalc/">Staffing Calculator</a></li>
         <li><a href="https://jvinlopez.github.io/Demand-Forecasting/">Demand Forecasting</a></li>
         <li><a href="https://jvinlopez.github.io/Queueing/">Queueing Theory</a></li>
         <li><a href="https://jvinlopez.github.io/Correlation/">Design of Experiment Pearson</a></li>
@@ -397,6 +396,69 @@
       } else {
         input.value = '';
       }
+    }
+    
+    // Tour steps for user guidance (optional enhancement)
+    const steps = [
+      { element: '#volume', text: 'The total volume of transactions.' },
+      { element: '#timeEffort', text: 'The time effort per transaction in seconds.' },
+      { element: '#workDays', text: 'The number of days covered by the volume.' },
+      { element: '#dailyHours', text: 'The amount of time an Employee works in a day (e.g., 8 hrs per day).' },
+      { element: '#operatingHours', text: 'Hours of Operation.' },
+      { element: '#shrinkage', text: 'Allowances for breaks, coaching, team meetings, training.' },
+      { element: '#currentHC', text: 'Current productive employee count.' },
+      { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
+      { element: '#revenuePerHour', text: 'Revenue generated per completed work per staff.' }
+    ];
+    let currentStep = 0;
+    
+    function startTour() {
+      document.getElementById('overlay').style.display = 'block';
+      showTooltip();
+    }
+    
+    function showTooltip() {
+      const step = steps[currentStep];
+      const element = document.querySelector(step.element);
+      if (!element) {
+        console.error(`Element not found for step:`, step);
+        endTour();
+        return;
+      }
+      const rect = element.getBoundingClientRect();
+      const tooltip = document.createElement('div');
+      tooltip.className = 'tooltip';
+      tooltip.innerHTML = `
+        <div>${step.text}</div>
+        <div style="margin-top: 5px;">
+          <button onclick="nextStep()" style="margin-right: 5px;">Next</button>
+          <button onclick="endTour()">End Tour</button>
+        </div>
+      `;
+      document.body.appendChild(tooltip);
+      
+      const tooltipWidth = tooltip.offsetWidth;
+      const tooltipHeight = tooltip.offsetHeight;
+      const horizontalCenter = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2) + 75;
+      const verticalPosition = rect.top + window.scrollY - tooltipHeight + 50;
+      tooltip.style.left = `${horizontalCenter}px`;
+      tooltip.style.top = `${verticalPosition}px`;
+    }
+    
+    function nextStep() {
+      document.querySelector('.tooltip').remove();
+      currentStep++;
+      if (currentStep < steps.length) {
+        showTooltip();
+      } else {
+        endTour();
+      }
+    }
+    
+    function endTour() {
+      document.querySelector('.tooltip')?.remove();
+      document.getElementById('overlay').style.display = 'none';
+      currentStep = 0;
     }
   </script>
 </body>
