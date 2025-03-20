@@ -197,13 +197,15 @@
         <input type="text" id="shrinkage" placeholder="Enter shrinkage" style="padding-right: 30px;" oninput="updateShrinkage(this)">
         <span style="position: absolute; right: 10px; top: 35px; color: #fff;">%</span>
       </div>
+      <!-- UPDATED: Changed label and placeholder -->
       <div class="input-group">
-        <label for="currentHC">Current HC:</label>
-        <input type="number" id="currentHC" placeholder="Enter current HC">
+        <label for="currentHC">Available Resource Headcount:</label>
+        <input type="number" id="currentHC" placeholder="Enter available resource headcount">
       </div>
+      <!-- UPDATED: Changed label and placeholder -->
       <div class="input-group">
-        <label for="costPerHour">Cost per Hour:</label>
-        <input type="number" id="costPerHour" placeholder="Enter cost per hour">
+        <label for="costPerHour">Operational Cost per Hour:</label>
+        <input type="number" id="costPerHour" placeholder="Enter operational cost per hour">
       </div>
       <div class="input-group">
         <label for="revenuePerHour">Revenue per Hour:</label>
@@ -327,8 +329,8 @@
         ["Daily Working Hours", document.getElementById('dailyHours').value],
         ["Operating Hours", document.getElementById('operatingHours').value],
         ["Shrinkage (%)", document.getElementById('shrinkage').value],
-        ["Current HC", document.getElementById('currentHC').value],
-        ["Cost per Hour", document.getElementById('costPerHour').value],
+        ["Available Resource Headcount", document.getElementById('currentHC').value],
+        ["Operational Cost per Hour", document.getElementById('costPerHour').value],
         ["Revenue per Hour", document.getElementById('revenuePerHour').value]
       ];
       
@@ -400,14 +402,14 @@
     
     // Tour steps for user guidance (optional enhancement)
     const steps = [
-      { element: '#volume', text: 'The total volume of transactions.' },
+      { element: '#volume', text: 'The quantity of transactions to be supported' },
       { element: '#timeEffort', text: 'The time effort per transaction in seconds.' },
       { element: '#workDays', text: 'The number of days covered by the volume.' },
       { element: '#dailyHours', text: 'The amount of time an Employee works in a day (e.g., 8 hrs per day).' },
       { element: '#operatingHours', text: 'Hours of Operation.' },
       { element: '#shrinkage', text: 'Allowances for breaks, coaching, team meetings, training.' },
-      { element: '#currentHC', text: 'Current productive employee count.' },
-      { element: '#costPerHour', text: 'The labor cost per hour for each employee.' },
+      { element: '#currentHC', text: 'Available Resource Headcount.' },
+      { element: '#costPerHour', text: 'Operational Cost per Hour.' },
       { element: '#revenuePerHour', text: 'Revenue generated per completed work per staff.' }
     ];
     let currentStep = 0;
